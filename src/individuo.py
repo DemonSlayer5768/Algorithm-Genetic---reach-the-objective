@@ -55,7 +55,7 @@ class Individuo:
         # normalizar velocidad
         try:
             if self.vel.length() > 0:
-                self.vel.scale_to_length(4)
+                self.vel.scale_to_length(10)  # Aumentado de 7 a 10
         except Exception:
             self.vivo = False
             return
@@ -74,23 +74,36 @@ class Individuo:
         for obs in obstaculos:
             if obs.collidepoint(self.pos):
                 self.colisiones += 1
-                self.vivo = False
+                self.pos -= self.vel  # Retroceder en lugar de morir
 
         if not limites.collidepoint(self.pos):
             self.vivo = False
 
-    def calcular_fitness(self):
-        progreso = 1 / (self.min_distancia + 1)
-        eficiencia = 1 / (self.step + 1)
-        suavidad = 1 / (self.cambios_direccion + 1)
+    # def calcular_fitness(self):
+    #     progreso = 1 / (self.min_distancia + 1)
+    #     eficiencia = 1 / (self.step + 1)
+    #     suavidad = 1 / (self.cambios_direccion + 1)
 
+    #     self.fitness = (
+    #         5.0 * progreso
+    #         + 30.0 * int(self.llego)
+    #         + 0.5 * eficiencia
+    #         + 0.1 * suavidad
+    #         - 3.0 * self.colisiones
+    #     )
+    def calcular_fitness(self):
+        # Distancia inicial desde inicio hasta objetivo
+        distancia_inicial = 570.0  # (500,600) -> (500,80)
+        progreso_directo = distancia_inicial - self.min_distancia
+        eficiencia = 1 / (self.step + 1)
+        
         self.fitness = (
-            5.0 * progreso
-            + 30.0 * int(self.llego)
-            + 0.5 * eficiencia
-            + 0.1 * suavidad
-            - 3.0 * self.colisiones
+            10.0 * progreso_directo    # 10 puntos por cada píxel de progreso real
+            + 5000.0 * int(self.llego) # Mega bonificación si llega
+            + 1.0 * eficiencia         # Pequeño bonus por eficiencia
+            - 0.05 * self.colisiones   # Casi sin penalización
         )
+
 
     def draw(self, pantalla, mejor=False):
         color = (60, 220, 120) if mejor else (100, 160, 255)

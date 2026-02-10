@@ -18,9 +18,10 @@ def main():
     limites = pantalla.get_rect()
     generacion = 1
     mejor = None
+    llegados = 0
 
     while True:
-        reloj.tick(60)
+        reloj.tick(0)  # Sin límite de FPS
         for e in pygame.event.get():
             if e.type == pygame.QUIT:
                 pygame.quit()
@@ -54,6 +55,9 @@ def main():
             for ind in poblacion:
                 ind.calcular_fitness()
 
+            # Contar individuos que llegaron al objetivo
+            llegados = sum(1 for ind in poblacion if ind.llego)
+
             padres = seleccionar(poblacion)
             mejor = padres[0]
 
@@ -71,7 +75,7 @@ def main():
             mejor.draw(pantalla, mejor=True)
 
         texto = fuente.render(
-            f"Gen: {generacion} | Mejor fitness: {mejor.fitness:.3f}" if mejor else "",
+            f"Gen: {generacion} | Mejor fitness: {mejor.fitness:.3f} | Llegados: {llegados}/{POBLACION}" if mejor else "",
             True, (240, 240, 240)
         )
         pantalla.blit(texto, (10, 10))
